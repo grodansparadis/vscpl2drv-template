@@ -4,7 +4,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright © 2000-2026 Ake Hedman, the VSCP Project
+// Copyright © 2000-2026 Ake Hedman and contributors, the VSCP Project
 // <info@vscp.org>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
