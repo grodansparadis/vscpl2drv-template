@@ -1,0 +1,17 @@
+{
+    "debug" : true,
+    "write" : false,
+    "rx-filter" : "0,0,0,-,0,0,0,-",
+    "max-queue-size" : 32000,
+    "logging" : {
+      "console-enable-log": true,
+      "console-log-level" : "info",
+      "console-pattern" : "[vscpl2drv-template %c] [%^%l%$] %v",
+      "file-enable-log": true,
+      "file-log-level" : "debug",
+      "file-pattern" : "[vscpl2drv-template %c] [%^%l%$] %v",
+      "file-path" : "/tmp/vscpl2drv-template.log",
+      "file-max-size" : 5242880,
+      "file-max-files" : 7
+    }
+}

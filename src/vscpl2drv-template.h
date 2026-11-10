@@ -1,0 +1,100 @@
+// vscpl2drv-template.h : main header file for the template driver
+// Linux/Windows version
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public License
+// as published by the Free Software Foundation; either version
+// 2 of the License, or (at your option) any later version.
+//
+// This file is part of the VSCP (http://www.vscp.org)
+//
+// Copyright (C) 2000-2026 Ake Hedman,
+// Ake Hedman, the VSCP Project, <akhe@vscp.org>
+//
+// This file is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser  General Public License
+// along with this file see the file COPYING.  If not, write to
+// the Free Software Foundation, 59 Temple Place - Suite 330,
+// Boston, MA 02111-1307, USA.
+//
+
+#if !defined(VSCPL2DRV_TEMPLATE_H__INCLUDED_)
+#define VSCPL2DRV_TEMPLATE_H__INCLUDED_
+
+// Robust Windows platform detection for GitHub Actions and various build environments
+#if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || defined(__WINDOWS__)
+#ifndef WIN32
+#define WIN32
+#endif
+#ifndef _WIN32
+#define _WIN32
+#endif
+#endif
+
+#ifdef WIN32
+#include "StdAfx.h"
+#endif
+
+#define _POSIX
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#ifdef WIN32
+#else
+#include <syslog.h>
+#include <unistd.h>
+#endif
+#include <canal-macro.h>
+#include <canal.h>
+#include <pthread.h>
+#include <vscp.h>
+
+#include "template.h"
+
+#ifndef BOOL
+typedef int BOOL;
+#endif
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+// This is the vendor string - Change to your own value
+#define VSCP_DLL_VENDOR "the VSCP Project, Sweden, https://www.vscp.org"
+
+/*!
+    Add a driver object
+
+    @param pif Object to add
+    @return handle or 0 for error
+*/
+long
+addDriverObject(CTemplateDrv *pif);
+
+/*!
+    Get a driver object from its handle
+
+    @param handle for object
+    @return pointer to object or NULL if invalid
+            handle.
+*/
+CTemplateDrv *
+getDriverObject(long handle);
+
+/*!
+    Remove a driver object
+    @param handle for object.
+*/
+void
+removeDriverObject(long handle);
+
+#endif // !defined(VSCPL2DRV_TEMPLATE_H__INCLUDED_)

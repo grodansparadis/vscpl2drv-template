@@ -1,0 +1,6 @@
+Man pages for the vscpl2drv-template driver.
+
+The man page is written in Markdown (vscpl2drv-template.1.md) and converted
+to man format with pandoc. The conversion is done automatically by the CMake
+build if pandoc is installed. You can also run ./make_man_pages to generate
+and install the man page manually.
