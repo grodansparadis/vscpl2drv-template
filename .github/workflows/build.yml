@@ -30,10 +30,21 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: cpack -G DEB
 
+    - name: Write SHA256SUMS
+      id: sha256sums_33
+      continue-on-error: true
+      shell: bash
+      run: |
+        bash .github/scripts/write-sha256sums.sh "SHA256SUMS-${{ matrix.os }}_vscpl2drv-template_deb" <<'SHA256SUMS_PATTERNS'
+        ${{github.workspace}}/build/*.deb
+        SHA256SUMS_PATTERNS
+
     - uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.os }}_vscpl2drv-template_deb
-        path: ${{github.workspace}}/build/*.deb
+        path: |
+          ${{github.workspace}}/build/*.deb
+          ${{ steps.sha256sums_33.outputs.file }}
         retention-days: 30
 
   build-macos:
