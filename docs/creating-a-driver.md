@@ -63,7 +63,7 @@ grep -rl --exclude-dir=build --exclude-dir=.git '"template.h"' .       | xargs s
 Also update:
 
 * `CMakeLists.txt` — the `project(...)` name, `APP_LOW_NAME`, `APP_NAME`, `APP_URL`, package description/summary, the source file list and the install rule for the sample configuration file.
-* `man/CMakeLists.txt` and `man/make_man_pages` — man page file names.
+* `man/CMakeLists.txt` (`MAN_PAGES`) and the name of `man/vscpl2drv-template.1.md` — the man page, converted with pandoc when the driver is built.
 * `src/version.h` — set your initial version (the VSCP convention is `year.month.patch`).
 * `docs/variables.xml` — `driver-name`, `document-version` and `creation-time`.
 * `docs/index.html` — the `name` and `repo` fields.
