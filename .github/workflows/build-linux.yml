@@ -1,0 +1,54 @@
+name: Linux
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: build-linux-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux:
+    name: Linux x86_64
+    # The oldest supported Ubuntu, so the package installs on 22.04 and newer
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake libssl-dev libexpat1-dev pandoc
+
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Package
+        working-directory: build
+        run: |
+          cpack -G "DEB;TGZ"
+          ls -l *.deb *.tar.gz
+
+      - name: Write SHA256SUMS
+        id: sha256sums
+        continue-on-error: true
+        shell: bash
+        run: |
+          bash "${GITHUB_WORKSPACE//\\//}/.github/scripts/write-sha256sums.sh" "SHA256SUMS-vscpl2drv-template-linux-x86_64" <<'SHA256SUMS_PATTERNS'
+          build/*.deb
+          build/*.tar.gz
+          SHA256SUMS_PATTERNS
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vscpl2drv-template-linux-x86_64
+          path: |
+            build/*.deb
+            build/*.tar.gz
+            ${{ steps.sha256sums.outputs.file }}
+          if-no-files-found: error

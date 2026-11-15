@@ -1,7 +1,10 @@
 # vscpl2drv-template
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-[![Build](https://github.com/grodansparadis/vscpl2drv-template/actions/workflows/build.yml/badge.svg)](https://github.com/grodansparadis/vscpl2drv-template/actions/workflows/build.yml)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+[![Linux](https://github.com/grodansparadis/vscpl2drv-template/actions/workflows/build-linux.yml/badge.svg?branch=master)](https://github.com/grodansparadis/vscpl2drv-template/actions/workflows/build-linux.yml?query=branch%3Amaster+is%3Asuccess)
+[![macOS](https://github.com/grodansparadis/vscpl2drv-template/actions/workflows/build-macos.yml/badge.svg?branch=master)](https://github.com/grodansparadis/vscpl2drv-template/actions/workflows/build-macos.yml?query=branch%3Amaster+is%3Asuccess)
+[![Windows](https://github.com/grodansparadis/vscpl2drv-template/actions/workflows/build-windows.yml/badge.svg?branch=master)](https://github.com/grodansparadis/vscpl2drv-template/actions/workflows/build-windows.yml?query=branch%3Amaster+is%3Asuccess)
+[![Project Status: Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 
 <img src="https://vscp.org/images/logo.png" width="100">
 

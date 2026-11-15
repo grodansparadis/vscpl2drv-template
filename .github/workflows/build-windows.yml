@@ -1,0 +1,61 @@
+name: Windows
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: build-windows-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    name: Windows x64
+    runs-on: windows-2022
+    env:
+      TRIPLET: x64-windows
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup vcpkg
+        shell: pwsh
+        run: |
+          git clone --depth=1 --branch 2026.06.01 https://github.com/microsoft/vcpkg.git "${{ github.workspace }}/.vcpkg"
+          & "${{ github.workspace }}/.vcpkg/bootstrap-vcpkg.bat"
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          $vcpkg = "${{ github.workspace }}/.vcpkg/vcpkg.exe"
+          & $vcpkg install expat:${env:TRIPLET} openssl:${env:TRIPLET} pthreads:${env:TRIPLET}
+
+      - name: Configure
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DVCPKG_TARGET_TRIPLET=${{ env.TRIPLET }} -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/.vcpkg/scripts/buildsystems/vcpkg.cmake"
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Install
+        shell: pwsh
+        run: |
+          cmake --install build --config Release --prefix "${{ github.workspace }}/staging"
+          Get-ChildItem -Recurse "${{ github.workspace }}/staging" | Select-Object -ExpandProperty FullName
+          Compress-Archive -Path "${{ github.workspace }}/staging/*" -DestinationPath "${{ github.workspace }}/vscpl2drv-template-windows-x64.zip"
+
+      - name: Write SHA256SUMS
+        id: sha256sums
+        continue-on-error: true
+        shell: bash
+        run: |
+          bash "${GITHUB_WORKSPACE//\\//}/.github/scripts/write-sha256sums.sh" "SHA256SUMS-vscpl2drv-template-windows-x64" <<'SHA256SUMS_PATTERNS'
+          vscpl2drv-template-windows-x64.zip
+          SHA256SUMS_PATTERNS
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vscpl2drv-template-windows-x64
+          path: |
+            vscpl2drv-template-windows-x64.zip
+            ${{ steps.sha256sums.outputs.file }}
+          if-no-files-found: error

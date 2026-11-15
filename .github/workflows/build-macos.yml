@@ -1,0 +1,52 @@
+name: macOS
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: build-macos-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  macos:
+    name: macOS arm64
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: brew install openssl@3 expat pandoc
+
+      - name: Configure
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
+            -DOPENSSL_ROOT_DIR=$(brew --prefix openssl@3) \
+            -DCMAKE_PREFIX_PATH=$(brew --prefix expat)
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Install
+        run: |
+          cmake --install build --prefix "${{ github.workspace }}/staging"
+          find "${{ github.workspace }}/staging" -type f
+          tar -C "${{ github.workspace }}/staging" -czf "${{ github.workspace }}/vscpl2drv-template-macos-arm64.tar.gz" .
+
+      - name: Write SHA256SUMS
+        id: sha256sums
+        continue-on-error: true
+        shell: bash
+        run: |
+          bash "${GITHUB_WORKSPACE//\\//}/.github/scripts/write-sha256sums.sh" "SHA256SUMS-vscpl2drv-template-macos-arm64" <<'SHA256SUMS_PATTERNS'
+          vscpl2drv-template-macos-arm64.tar.gz
+          SHA256SUMS_PATTERNS
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vscpl2drv-template-macos-arm64
+          path: |
+            vscpl2drv-template-macos-arm64.tar.gz
+            ${{ steps.sha256sums.outputs.file }}
+          if-no-files-found: error
