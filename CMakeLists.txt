@@ -115,7 +115,13 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
 # Default location for VSCP level II drivers
-set(VSCP_LEVEL2_DRV_DIR /var/lib/vscp/drivers/level2/)
+# Linux: where the VSCP daemon looks for Level II drivers. macOS: below the
+# install prefix (/var/lib is not writable there and ignores --prefix).
+if(APPLE)
+  set(VSCP_LEVEL2_DRV_DIR drivers/level2)
+else()
+  set(VSCP_LEVEL2_DRV_DIR /var/lib/vscp/drivers/level2/)
+endif()
 
 # Generate position-independent code (-fPIC on UNIX)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
