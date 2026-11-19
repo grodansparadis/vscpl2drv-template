@@ -57,6 +57,19 @@
 
 #include "template.h"
 
+// The driver's logger is the default spdlog logger of the library. When an
+// instance is closed it is replaced by one without sinks, so a later
+// instance in the same process (a driver restart, a failed open followed by
+// a new one) can log and set up its own. spdlog::shutdown() is not used: it
+// would destroy the thread pool another instance may still use.
+static void
+releaseLogger(void)
+{
+  spdlog::drop("logger");
+  spdlog::drop("vscpl2drv-template-idle");
+  spdlog::set_default_logger(std::make_shared<spdlog::logger>("vscpl2drv-template-idle"));
+}
+
 // Forward declaration of worker thread
 #ifdef WIN32
 DWORD WINAPI
@@ -124,7 +137,9 @@ CTemplateDrv::CTemplateDrv(void)
   m_max_log_files = 7;
 
   // Init logging pool
-  spdlog::init_thread_pool(8192, 1);
+  if (nullptr == spdlog::thread_pool()) {
+    spdlog::init_thread_pool(8192, 1);
+  }
 
   // Flush log every five seconds
   spdlog::flush_every(std::chrono::seconds(5));
@@ -207,7 +222,7 @@ CTemplateDrv::open(std::string &path, const uint8_t *pguid)
   // Start the worker thread
   if (VSCP_ERROR_SUCCESS != start()) {
     spdlog::critical("[vscpl2drv-template] Failed to start driver.");
-    spdlog::drop_all();
+    releaseLogger();
     return VSCP_ERROR_INIT_FAIL;
   }
 
@@ -226,7 +241,7 @@ CTemplateDrv::close(void)
 {
   // Do nothing if already terminated
   if (m_bQuit) {
-    spdlog::drop_all();
+    releaseLogger();
     return VSCP_ERROR_SUCCESS;
   }
 
@@ -236,8 +251,7 @@ CTemplateDrv::close(void)
   // TODO: Close/disconnect from your device or service here if you opened
   //       it in open().
 
-  spdlog::drop_all();
-  spdlog::shutdown();
+  releaseLogger();
 
   return VSCP_ERROR_SUCCESS;
 }
@@ -580,6 +594,7 @@ CTemplateDrv::doLoadConfig(std::string &path)
                                                        sinks.end(),
                                                        spdlog::thread_pool(),
                                                        spdlog::async_overflow_policy::block);
+  spdlog::drop("logger"); // From an earlier configuration of this or another instance
   spdlog::register_logger(logger);
   spdlog::set_default_logger(logger);
 

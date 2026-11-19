@@ -7,6 +7,9 @@ tagged, rename **Unreleased** to the version and date, and start a new
 
 ## Unreleased
 
+- Fix: after a driver instance was closed (also after a failed open) the next VSCPOpen in the same process crashed, because close() dropped all loggers and shut spdlog down. The instance's logger is now replaced by one without sinks, and the thread pool is created only once
+- Fix: a second instance in the same process threw when it registered its logger (the name was taken)
+- Fix: VSCPWrite leaked the copy of the event when the send queue was full; it now frees it and returns CANAL_ERROR_FIFO_FULL
 - CI: one workflow per platform (Linux, macOS, Windows), each uploading the built driver as an artifact with SHA256SUMS; README badges for license, the three builds and project status
 - Build against the latest vscp master (d75d4f5c6)
 - Man page vscpl2drv-template(1) describes the driver and its configuration file. It is converted from man/vscpl2drv-template.1.md with pandoc when the driver is built and installed in share/man/man1; old man page scripts and generated files are removed
