@@ -16,7 +16,7 @@ jobs:
     env:
       TRIPLET: x64-windows
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup vcpkg
         shell: pwsh
@@ -52,7 +52,7 @@ jobs:
           vscpl2drv-template-windows-x64.zip
           SHA256SUMS_PATTERNS
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: vscpl2drv-template-windows-x64
           path: |
